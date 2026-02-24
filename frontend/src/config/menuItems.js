@@ -12,7 +12,9 @@ import {
   InfoOutlined,
   Language as LanguageIcon,
   Lock as LockIcon,
+  Memory as MemoryIcon,
   MenuOpen as MenuOpenIcon,
+  Person as PersonIcon,
   /* QuestionAnswer, */
   SettingsApplications as SettingsIcon,
   Style as StyleIcon,
@@ -101,6 +103,18 @@ const getMenuItems = (props) => {
       visible: isAuthorised,
       primaryText: intl.formatMessage({ id: 'home' }),
       leftIcon: <DashboardIcon />,
+    },
+    {
+      value: '/user',
+      visible: isAuthorised,
+      primaryText: intl.formatMessage({ id: 'user', defaultMessage: 'User' }),
+      leftIcon: <PersonIcon />,
+    },
+    {
+      value: '/device',
+      visible: isAuthorised,
+      primaryText: intl.formatMessage({ id: 'device', defaultMessage: 'Device' }),
+      leftIcon: <MemoryIcon />,
     },
     /* {
       primaryText: intl.formatMessage({ id: 'demos', defaultMessage: 'Demos' }),

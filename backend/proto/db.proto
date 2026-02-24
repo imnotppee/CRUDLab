@@ -27,6 +27,7 @@ message document {
   string data = 3;
   string populate = 4;
   string select = 5;
+  string userId = 6;
 }
 
 message respObj {

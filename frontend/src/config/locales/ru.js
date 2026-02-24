@@ -5,6 +5,8 @@ const messages = {
   password: 'Пароль',
   about: 'О нас',
   home: 'Главная',
+  user: 'Пользователь',
+  device: 'Устройство',
   page_not_found: 'Страница не найдена',
   settings: 'Настройки',
   language: 'Язык',

@@ -22,6 +22,7 @@ const dbaseproject = grpc.loadPackageDefinition(packageDefinition).dbaseproject;
 const sch = {
   mongoose,
   userSchema,
+  logSchema,
 } = require('./libs/schema');
 
 const db = {
@@ -63,6 +64,32 @@ function baseConnect (name,) {
   });  
 }
 
+/* 
+  Log function
+*/
+
+async function createLog(collection, operation, documentId, data, userId = 'system') {
+  const base = db.MainBase
+  if (base && base.models['Log']) {
+    try {
+      const LogModel = base.models['Log']
+      const logData = {
+        _id: new mongoose.Types.ObjectId() + '',
+        collectionName: collection,
+        operation: operation,
+        documentId: documentId,
+        data: data,
+        userId: userId,
+        timestamp: new Date(),
+      }
+      await LogModel.insertOne(logData)
+      console.log('Log created:', operation, collection, documentId, 'by', userId)
+    } catch (error) {
+      console.error('Error creating log:', error)
+    }
+  }
+}
+
 async function createDocument (call, cb) {
 
   console.log('createDocument ->', call.request.collection, );
@@ -88,7 +115,12 @@ async function createDocument (call, cb) {
 
     Model.insertOne(data).then(function (resp) { 
       // console.log(resp)
-      if (resp)  obj.data = JSON.stringify([resp])
+      if (resp)  {
+        obj.data = JSON.stringify([resp])
+        // Log the create operation
+        const userId = call.request.userId || 'system'
+        createLog(call.request.collection, 'CREATE', data._id, data, userId)
+      }
       cb(null, obj)
     });  
     
@@ -168,6 +200,9 @@ async function updateDocument (call, cb) {
           console.error('updateDocument -> error!');
         }
         obj.data = JSON.stringify(resp)
+        // Log the update operation
+        const userId = call.request.userId || 'system'
+        createLog(call.request.collection, 'UPDATE', data._id, data, userId)
         cb(null, obj)
       }
       else  {
@@ -201,6 +236,9 @@ async function deleteDocument (call, cb) {
       // console.log(err, resp);
       if (resp)  {
         obj.data = JSON.stringify(resp)
+        // Log the delete operation
+        const userId = call.request.userId || 'system'
+        createLog(call.request.collection, 'DELETE', query._id || 'unknown', query, userId)
       }
       cb(null, obj)
     });  
@@ -278,7 +316,9 @@ async function main ()  {
   }
   
   if (db.MainBase)  {
-    db.MainBase.model('User', sch.userSchema);      
+    db.MainBase.model('User', sch.userSchema);
+    db.MainBase.model('Device', sch.deviceSchema);
+    db.MainBase.model('Log', sch.logSchema);
   }
   else  {
     main()

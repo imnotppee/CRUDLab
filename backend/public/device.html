@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Device</title>
+    <style>
+      :root {
+        --bg: #f4f6f9;
+        --panel: #ffffff;
+        --line: #d7dde6;
+        --head: #e7ebf2;
+        --accent: #1e6fd9;
+        --muted: #6b7280;
+        --danger: #d93b3b;
+        --success: #1f9d55;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg);
+        color: #1f2937;
+      }
+      header {
+        background: linear-gradient(90deg, #2a69d1, #4b8af0);
+        color: #fff;
+        padding: 14px 24px;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+      main {
+        padding: 18px 20px 28px;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 320px 1fr;
+      }
+      @media (max-width: 980px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+        overflow: hidden;
+      }
+      .panel h2 {
+        margin: 0;
+        padding: 12px 14px;
+        background: var(--head);
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .panel-body {
+        padding: 12px 14px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 8px 10px;
+        text-align: left;
+        vertical-align: middle;
+      }
+      th {
+        background: #f0f3f8;
+        font-weight: 600;
+        color: #111827;
+      }
+      tr:hover {
+        background: #f8fafc;
+      }
+      .row-actions {
+        display: flex;
+        gap: 6px;
+      }
+      button {
+        border: none;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      button.primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      button.ghost {
+        background: #eef2ff;
+        color: #2a3f6f;
+      }
+      button.danger {
+        background: var(--danger);
+        color: #fff;
+      }
+      button.success {
+        background: var(--success);
+        color: #fff;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .form-grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .form-grid label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .form-grid input,
+      .form-grid select {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-size: 13px;
+      }
+      .full {
+        grid-column: 1 / -1;
+      }
+      .tag-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #e6efff;
+        color: #2954b3;
+        font-size: 11px;
+      }
+      .checkbox-cell {
+        text-align: center;
+      }
+      .checkbox-cell input {
+        transform: scale(1.1);
+      }
+      .footer-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        padding-top: 10px;
+      }
+      .note {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .empty {
+        padding: 14px;
+        text-align: center;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header>Device Management</header>
+    <main>
+      <section class="panel">
+        <h2>Devices</h2>
+        <div class="panel-body">
+          <div class="toolbar" style="margin-bottom: 10px;">
+            <button class="success" id="newDeviceBtn">New Device</button>
+            <button class="primary" id="refreshBtn">Refresh</button>
+          </div>
+          <table id="deviceTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Site</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="deviceEmpty" class="empty" style="display: none;">
+            No devices found.
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Edit Device</h2>
+        <div class="panel-body">
+          <div class="form-grid">
+            <div>
+              <label for="deviceId">Device ID</label>
+              <input id="deviceId" placeholder="device-001" />
+            </div>
+            <div>
+              <label for="deviceName">Device Name</label>
+              <input id="deviceName" placeholder="Virtual Device" />
+            </div>
+            <div>
+              <label for="siteId">Site ID</label>
+              <input id="siteId" placeholder="site-01" />
+            </div>
+            <div>
+              <label for="deviceModel">Model</label>
+              <input id="deviceModel" placeholder="Model X" />
+            </div>
+            <div>
+              <label for="apiCode">API Code</label>
+              <input id="apiCode" placeholder="API-001" />
+            </div>
+            <div>
+              <label for="lineId">Line ID</label>
+              <input id="lineId" placeholder="Line-01" />
+            </div>
+            <div class="full">
+              <label for="deviceNote">Note</label>
+              <input id="deviceNote" placeholder="optional notes" />
+            </div>
+          </div>
+
+          <div class="tag-toolbar" style="margin-top: 14px;">
+            <div>
+              <span class="badge">Tags</span>
+              <span class="muted">Add, edit, or remove tags for this device.</span>
+            </div>
+            <button class="ghost" id="addTagBtn">Add Tag</button>
+          </div>
+
+          <table id="tagTable">
+            <thead>
+              <tr>
+                <th style="width: 160px;">Tag Name</th>
+                <th style="width: 140px;">Value</th>
+                <th class="checkbox-cell" style="width: 70px;">Record</th>
+                <th class="checkbox-cell" style="width: 70px;">Sync</th>
+                <th class="checkbox-cell" style="width: 70px;">API</th>
+                <th style="width: 90px;">Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+
+          <div class="footer-actions">
+            <button class="danger" id="deleteBtn">Delete</button>
+            <button class="ghost" id="resetBtn">Reset</button>
+            <button class="primary" id="saveBtn">Save</button>
+          </div>
+          <div class="note">Save will create or update the device based on Device ID.</div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const collection = 'Device'
+      const deviceTableBody = document.querySelector('#deviceTable tbody')
+      const deviceEmpty = document.getElementById('deviceEmpty')
+      const tagTableBody = document.querySelector('#tagTable tbody')
+
+      const deviceIdInput = document.getElementById('deviceId')
+      const deviceNameInput = document.getElementById('deviceName')
+      const siteIdInput = document.getElementById('siteId')
+      const deviceModelInput = document.getElementById('deviceModel')
+      const apiCodeInput = document.getElementById('apiCode')
+      const lineIdInput = document.getElementById('lineId')
+      const deviceNoteInput = document.getElementById('deviceNote')
+
+      const newDeviceBtn = document.getElementById('newDeviceBtn')
+      const refreshBtn = document.getElementById('refreshBtn')
+      const addTagBtn = document.getElementById('addTagBtn')
+      const saveBtn = document.getElementById('saveBtn')
+      const deleteBtn = document.getElementById('deleteBtn')
+      const resetBtn = document.getElementById('resetBtn')
+
+      let devices = []
+      let currentDeviceId = ''
+
+      function getAuth() {
+        const item = localStorage.getItem('base-shell:auth')
+        return item ? JSON.parse(item) : null
+      }
+
+      function getEmptyDevice() {
+        return {
+          _id: '',
+          deviceName: '',
+          siteId: '',
+          model: '',
+          apiCode: '',
+          lineId: '',
+          note: '',
+          tags: [],
+        }
+      }
+
+      function readForm() {
+        return {
+          _id: deviceIdInput.value.trim(),
+          deviceName: deviceNameInput.value.trim(),
+          siteId: siteIdInput.value.trim(),
+          model: deviceModelInput.value.trim(),
+          apiCode: apiCodeInput.value.trim(),
+          lineId: lineIdInput.value.trim(),
+          note: deviceNoteInput.value.trim(),
+          tags: readTags(),
+        }
+      }
+
+      function writeForm(device) {
+        deviceIdInput.value = device._id || ''
+        deviceNameInput.value = device.deviceName || ''
+        siteIdInput.value = device.siteId || ''
+        deviceModelInput.value = device.model || ''
+        apiCodeInput.value = device.apiCode || ''
+        lineIdInput.value = device.lineId || ''
+        deviceNoteInput.value = device.note || ''
+        renderTags(device.tags || [])
+      }
+
+      function renderDevices() {
+        deviceTableBody.innerHTML = ''
+        if (!devices.length) {
+          deviceEmpty.style.display = 'block'
+          return
+        }
+        deviceEmpty.style.display = 'none'
+        devices.forEach((device) => {
+          const row = document.createElement('tr')
+          row.innerHTML = `
+            <td>${device._id || ''}</td>
+            <td>${device.deviceName || ''}</td>
+            <td>${device.siteId || ''}</td>
+          `
+          row.addEventListener('click', () => {
+            currentDeviceId = device._id
+            writeForm(device)
+          })
+          deviceTableBody.appendChild(row)
+        })
+      }
+
+      function createTagRow(tag = {}) {
+        const row = document.createElement('tr')
+        row.innerHTML = `
+          <td><input type="text" value="${tag.name || ''}" placeholder="tag" /></td>
+          <td><input type="text" value="${tag.value || ''}" placeholder="value" /></td>
+          <td class="checkbox-cell"><input type="checkbox" ${tag.record ? 'checked' : ''} /></td>
+          <td class="checkbox-cell"><input type="checkbox" ${tag.sync ? 'checked' : ''} /></td>
+          <td class="checkbox-cell"><input type="checkbox" ${tag.api ? 'checked' : ''} /></td>
+          <td>
+            <div class="row-actions">
+              <button class="ghost" type="button">Remove</button>
+            </div>
+          </td>
+        `
+        const removeBtn = row.querySelector('button')
+        removeBtn.addEventListener('click', () => {
+          row.remove()
+        })
+        return row
+      }
+
+      function renderTags(tags) {
+        tagTableBody.innerHTML = ''
+        tags.forEach((tag) => tagTableBody.appendChild(createTagRow(tag)))
+      }
+
+      function readTags() {
+        const rows = Array.from(tagTableBody.querySelectorAll('tr'))
+        return rows.map((row) => {
+          const inputs = row.querySelectorAll('input')
+          return {
+            name: inputs[0].value.trim(),
+            value: inputs[1].value.trim(),
+            record: inputs[2].checked,
+            sync: inputs[3].checked,
+            api: inputs[4].checked,
+          }
+        })
+      }
+
+      async function loadDevices() {
+        const auth = getAuth()
+        if (!auth || !auth.token) {
+          alert('Please sign in first.')
+          return
+        }
+        const resp = await fetch('/api/preferences/readDocument', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: auth.token,
+          },
+          body: JSON.stringify({
+            collection: collection,
+            query: {},
+          }),
+        })
+        devices = await resp.json()
+        renderDevices()
+      }
+
+      async function saveDevice() {
+        const auth = getAuth()
+        if (!auth || !auth.token) {
+          alert('Please sign in first.')
+          return
+        }
+        const device = readForm()
+        if (!device._id) {
+          alert('Device ID is required.')
+          return
+        }
+        const existing = devices.find((d) => d._id === device._id)
+        const endpoint = existing ? '/api/preferences/updateDocument' : '/api/preferences/createDocument'
+        if (!existing) {
+          device.dateCreate = new Date().toISOString()
+        }
+        device.dateUpdate = new Date().toISOString()
+
+        await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: auth.token,
+          },
+          body: JSON.stringify({
+            collection: collection,
+            data: device,
+          }),
+        })
+        await loadDevices()
+        currentDeviceId = device._id
+      }
+
+      async function deleteDevice() {
+        const auth = getAuth()
+        if (!auth || !auth.token) {
+          alert('Please sign in first.')
+          return
+        }
+        const deviceId = deviceIdInput.value.trim()
+        if (!deviceId) {
+          alert('Select a device to delete.')
+          return
+        }
+        if (!window.confirm('Delete this device?')) {
+          return
+        }
+        await fetch('/api/preferences/deleteDocument', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: auth.token,
+          },
+          body: JSON.stringify({
+            collection: collection,
+            query: { _id: deviceId },
+          }),
+        })
+        writeForm(getEmptyDevice())
+        await loadDevices()
+      }
+
+      function resetForm() {
+        currentDeviceId = ''
+        writeForm(getEmptyDevice())
+      }
+
+      newDeviceBtn.addEventListener('click', resetForm)
+      refreshBtn.addEventListener('click', loadDevices)
+      addTagBtn.addEventListener('click', () => {
+        tagTableBody.appendChild(createTagRow())
+      })
+      saveBtn.addEventListener('click', saveDevice)
+      deleteBtn.addEventListener('click', deleteDevice)
+      resetBtn.addEventListener('click', () => {
+        if (currentDeviceId) {
+          const device = devices.find((d) => d._id === currentDeviceId)
+          if (device) {
+            writeForm(device)
+            return
+          }
+        }
+        resetForm()
+      })
+
+      loadDevices()
+    </script>
+  </body>
+</html>

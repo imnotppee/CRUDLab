@@ -5,6 +5,8 @@ const messages = {
   password: 'Password',
   about: 'About',
   home: 'Home',
+  user: 'User',
+  device: 'Device',
   page_not_found: 'Page not found',
   settings: 'Settings',
   language: 'Language',

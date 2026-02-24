@@ -21,11 +21,14 @@ function restInit(
 
       console.log('/createDocument ->', req.body);
 
-      if (req.body.data.password)  req.body.data.password = await createPassword(req.body.data.password);
+      // Password hashing disabled to allow plain-text updates.
+
+      const userId = req.user ? req.user._id : 'unknown';
 
       dbase.createDocument({
         collection: req.body.collection,
         data: JSON.stringify(req.body.data),
+        userId: userId,
       }, (err, resp) => {
 
         console.log(err, resp)
@@ -66,10 +69,17 @@ function restInit(
   router.post('/updateDocument', passport.authenticate('jwt', { session: false }), function(req, res) {
       console.log('/updateDocument ->', req.body);
 
+      const userId = req.user ? req.user._id : 'unknown';
+
+      if (req.body.data && req.body.data.password === '') {
+        delete req.body.data.password
+      }
+
       dbase.updateDocument({
         collection: req.body.collection,
         query: JSON.stringify({ _id: req.body.data._id}),
         data: JSON.stringify(req.body.data),
+        userId: userId,
       }, (err, resp) => {
 
       console.log(err, resp)
@@ -84,9 +94,12 @@ function restInit(
   router.post('/deleteDocument', passport.authenticate('jwt', { session: false }), function(req, res) {
     console.log('/deleteDocument ->', req.body);
 
+    const userId = req.user ? req.user._id : 'unknown';
+
     dbase.deleteDocument({
       collection: req.body.collection,
       query: JSON.stringify(req.body.query),
+      userId: userId,
     }, (err, resp) => {
 
       console.log(err, resp)

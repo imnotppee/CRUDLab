@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
@@ -40,9 +39,9 @@ const userInit = (dbase, privateKey) => {
 
       console.log('User ->', userName, password, user);
 
-      bcrypt.compare(password, user.password).then(isMatch => {
+      const isMatch = password === user.password
 
-        if(isMatch) {
+      if (isMatch) {
 
           const payload = {
             _id: user._id,
@@ -78,15 +77,14 @@ const userInit = (dbase, privateKey) => {
             })();   
           });
         }
-        else {
+      else {
 
-          return res.json({
-            text: 'Username or password incorrect!',
-            token: null,
-          })
+        return res.json({
+          text: 'Username or password incorrect!',
+          token: null,
+        })
 
-        }                  
-      }); 
+      }
     })
 
   });

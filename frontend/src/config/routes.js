@@ -8,7 +8,9 @@ const SignUp = lazy(() => import('../pages/SignUp/SignUp'))
 const PasswordReset = lazy(() => import('../pages/PasswordReset/PasswordReset'))
 const About = lazy(() => import('../pages/About'))
 const Home = lazy(() => import('../pages/Home/Home'))
-const MyAccount = lazy(() => import('../pages/MyAccount/MyAccount')) 
+const MyAccount = lazy(() => import('../pages/MyAccount/MyAccount'))
+const User = lazy(() => import('../pages/User/User'))
+const Device = lazy(() => import('../pages/Device'))
 
 /* const DialogDemo = lazy(() => import('../pages/DialogDemo/DialogDemo'))
 const ToastDemo = lazy(() => import('../pages/ToastDemo/ToastDemo'))
@@ -65,6 +67,33 @@ const routes = [
     element: (
       <AuthorizedRoute>
         <Home />
+      </AuthorizedRoute>
+    ),
+  },
+  {
+    path: '/user',
+    exact: true,
+    element: (
+      <AuthorizedRoute>
+        <User />
+      </AuthorizedRoute>
+    ),
+  },
+  {
+    path: '/device',
+    exact: true,
+    element: (
+      <AuthorizedRoute>
+        <Device />
+      </AuthorizedRoute>
+    ),
+  },
+{
+    path: '/device',
+    exact: true,
+    element: (
+      <AuthorizedRoute>
+        <device />
       </AuthorizedRoute>
     ),
   },
