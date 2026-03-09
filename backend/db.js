@@ -22,6 +22,7 @@ const dbaseproject = grpc.loadPackageDefinition(packageDefinition).dbaseproject;
 const sch = {
   mongoose,
   userSchema,
+  deviceSchema,
   logSchema,
 } = require('./libs/schema');
 
@@ -158,14 +159,30 @@ async function readDocument (call, cb) {
     if (Object.keys(query).length)  {      
       Model.findOne(query).populate(populate).select(select).then(function (resp) { 
         // console.log(resp)
-        if (resp)  obj.data = JSON.stringify([resp])
+        if (resp) {
+          // ⭐ Debug: log tags with intervals when retrieving
+          if (call.request.collection === 'Device' && resp.tags) {
+            console.log('📖 Retrieved Device with tags:', resp.tags.map(t => ({ name: t.name, interval: t.interval })))
+          }
+          obj.data = JSON.stringify([resp])
+        }
         cb(null, obj)
       });  
     }
     else  {
       Model.find(query).populate(populate).select(select).then(function (resp) { 
         // console.log(resp)
-        if (resp)  obj.data = JSON.stringify(resp)
+        if (resp) {
+          // ⭐ Debug: log tags with intervals for all devices
+          if (call.request.collection === 'Device') {
+            resp.forEach((device, idx) => {
+              if (device.tags) {
+                console.log(`📖 Device ${idx} (${device._id}) tags:`, device.tags.map(t => ({ name: t.name, interval: t.interval })))
+              }
+            })
+          }
+          obj.data = JSON.stringify(resp)
+        }
         cb(null, obj)
       });  
     }
@@ -192,6 +209,22 @@ async function updateDocument (call, cb) {
     const Model = base.models[call.request.collection]
     const query = JSON.parse(call.request.query)
     let data = JSON.parse(call.request.data)
+
+    if (call.request.collection === 'Device' && Array.isArray(data.tags)) {
+      const validIntervals = ['none', '1m', '5m', '10m', '1h']
+      data.tags = data.tags.map((tag) => {
+        const interval = validIntervals.includes(tag.interval) ? tag.interval : 'none'
+        return {
+          ...tag,
+          interval,
+        }
+      })
+    }
+
+    // ⭐ Debug: log tags with intervals
+    if (call.request.collection === 'Device' && data.tags) {
+      console.log('💾 Saving Device with tags:', data.tags.map(t => ({ name: t.name, interval: t.interval })))
+    }
 
     Model.updateOne(query, { $set: data } ).then(function (resp) { 
       // console.log('updateDocument ->', resp,);

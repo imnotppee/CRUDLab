@@ -105,6 +105,12 @@ const getMenuItems = (props) => {
       leftIcon: <DashboardIcon />,
     },
     {
+      value: '/dashboard',
+      visible: isAuthorised,
+      primaryText: intl.formatMessage({ id: 'dashboard', defaultMessage: 'Dashboard' }),
+      leftIcon: <DashboardIcon />,
+    },
+    {
       value: '/user',
       visible: isAuthorised,
       primaryText: intl.formatMessage({ id: 'user', defaultMessage: 'User' }),

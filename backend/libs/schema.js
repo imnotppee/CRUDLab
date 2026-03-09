@@ -19,6 +19,13 @@ const deviceTagSchema = new Schema({
   record: Boolean,
   sync: Boolean,
   api: Boolean,
+  script: String,
+  interval: { type: String, default: 'none' }, // ⭐ Default: 'none', values: '1m', '5m', '10m', '1h', 'none'
+  lastScriptRun: Date, // ⭐ Track last execution for auto-run
+  history: [{ // ⭐ เก็บประวัติค่าและเวลา
+    value: Schema.Types.Mixed,
+    timestamp: Date,
+  }],
 }, { _id: false })
 
 const deviceSchema = new Schema({
